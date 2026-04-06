@@ -39,33 +39,6 @@ export async function apiRequest(path, options = {}) {
   const isJson = contentType.includes("application/json");
   const responseBody = isJson ? await response.json().catch(() => null) : await response.text();
 
-  // #region agent log
-  if (normalizedPath.startsWith("/api/auth/login")) {
-    fetch("http://127.0.0.1:7624/ingest/11d329a9-994d-4584-8e9f-2a898b8af697", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "a3da39" },
-      body: JSON.stringify({
-        sessionId: "a3da39",
-        hypothesisId: "C",
-        location: "http.js:apiRequest:afterFetch",
-        message: "login fetch completed",
-        data: {
-          requestUrl: url,
-          baseUrlLength: baseUrl.length,
-          responseOk: response.ok,
-          status: response.status,
-          contentTypeSnippet: contentType.slice(0, 48),
-          isJson,
-          bodyIsObject: responseBody !== null && typeof responseBody === "object",
-          hasTokenKey:
-            responseBody !== null && typeof responseBody === "object" && "token" in responseBody,
-        },
-        timestamp: Date.now(),
-      }),
-    }).catch(() => {});
-  }
-  // #endregion
-
   if (!response.ok) {
     if (response.status === 401 && !normalizedPath.startsWith("/api/auth/login")) {
       const { useAuthStore } = await import("../stores/auth.js");

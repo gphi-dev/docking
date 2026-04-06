@@ -3,8 +3,8 @@ import vue from "@vitejs/plugin-vue";
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), "");
-  // Default to 3001: port 3000 is often another local app returning HTML 404 for /api/*.
-  const apiProxyTarget = env.VITE_DEV_API_PROXY_TARGET || "http://127.0.0.1:3001";
+  // Match backend `PORT` default (3000). If something else uses 3000, set VITE_DEV_API_PROXY_TARGET.
+  const apiProxyTarget = env.VITE_DEV_API_PROXY_TARGET || "http://127.0.0.1:3000";
 
   const apiProxyConfig = {
     "/api": {

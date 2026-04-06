@@ -43,23 +43,6 @@ export const useAuthStore = defineStore("auth", () => {
       method: "POST",
       body: JSON.stringify({ username, password }),
     });
-    // #region agent log
-    fetch("http://127.0.0.1:7624/ingest/11d329a9-994d-4584-8e9f-2a898b8af697", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "a3da39" },
-      body: JSON.stringify({
-        sessionId: "a3da39",
-        hypothesisId: "E",
-        location: "auth.js:loginWithCredentials:afterRequest",
-        message: "login payload shape",
-        data: {
-          payloadType: typeof payload,
-          hasToken: Boolean(payload?.token),
-        },
-        timestamp: Date.now(),
-      }),
-    }).catch(() => {});
-    // #endregion
     if (!payload?.token) {
       throw new Error("Login response missing token");
     }
