@@ -1,0 +1,9 @@
+Name: "MobileVerifierAPI"
+Port: 8080
+
+Mysql:
+  DataSource: "dev:3zqknH$$.^rjCFTP@tcp(136.110.11.139:3306)/main?charset=utf8mb4&parseTime=True&loc=Local"
+
+Auth:
+  AccessSecret: "sikreto-key-ko-to-12345"
+  AccessExpire: 86400
