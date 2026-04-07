@@ -36,6 +36,7 @@ async function loadAdmins() {
 onMounted(() => {
   loadAdmins();
 });
+
 </script>
 
 <template>
@@ -47,7 +48,7 @@ onMounted(() => {
 
     <p v-if="loadError" class="rounded-lg border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800">
       {{ loadError }}
-    </p>
+    </p> 
 
     <div class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
       <div class="overflow-x-auto">
