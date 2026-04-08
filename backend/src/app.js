@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import { env } from "./config/env.js";
 import { authRouter } from "./routes/auth.routes.js";
+// import authRouter from "./routes/auth.routes.js";
 import { gamesRouter } from "./routes/games.routes.js";
 import { subscribersRouter } from "./routes/subscribers.routes.js";
 import { adminsRouter } from "./routes/admins.routes.js";
