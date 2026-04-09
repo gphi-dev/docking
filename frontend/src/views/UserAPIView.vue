@@ -1,6 +1,7 @@
 <script setup>
 import { onMounted, ref } from "vue";
 import { useAuthStore } from "../stores/auth";
+import { apiRequest } from "../api/http";
 
 // 1. Initialize the auth store
 const authStore = useAuthStore();
@@ -30,25 +31,10 @@ async function loadUsersmobile() {
   loadError.value = "";
   isLoadingMobile.value = true;
   try {
-    const response = await fetch("http://localhost:8080/api/test/users", {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzU2MTczMjYsInVzZXJfaWQiOjJ9.u1YcPVObXEgO1e6JE9Z3dqoLwb4ZRqp70GBZkJ1q14M"
-      }
-    });
-
-    if (!response.ok) {
-      throw new Error(`Failed to load usersmobile API (Status: ${response.status})`);
-    }
-
-    const data = await response.json();
-    
-    // FIX 1: Extract from data.data because the Go API wraps the response
-    usersmobile.value = Array.isArray(data.data) ? data.data : [];
-    
+    const payload = await apiRequest("api/usermobile");
+    usersmobile.value = Array.isArray(payload) ? payload : [];
   } catch (error) {
-    loadError.value = error?.message || "Failed to load mobile users";
+    loadError.value = error?.message || "Failed to load mobile number of users";
   } finally {
     isLoadingMobile.value = false;
   }
@@ -78,28 +64,24 @@ onMounted(() => {
             <tr>
               <th class="px-4 py-3">Phone Number</th>
               <th class="px-4 py-3">Game ID</th> 
-              <th class="px-4 py-3">Created</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-slate-100">
             
             <tr v-if="isLoadingMobile">
-              <td colspan="3" class="px-4 py-10 text-center text-slate-500">Loading…</td>
+              <td colspan="2" class="px-4 py-10 text-center text-slate-500">Loading…</td>
             </tr>
             
             <tr v-else-if="usersmobile.length === 0">
-              <td colspan="3" class="px-4 py-10 text-center text-slate-500">No mobile users found.</td>
+              <td colspan="2" class="px-4 py-10 text-center text-slate-500">No mobile users found.</td>
             </tr>
             
             <tr v-for="user in usersmobile" :key="user.id" class="hover:bg-slate-50/80">
               <td class="px-4 py-3 font-semibold text-slate-900">
-                {{ user.Phone }}
+                {{ user.phone }}
               </td>
               <td class="px-4 py-3 text-slate-600">
-                {{ user.GameID || '—' }}
-              </td>
-              <td class="whitespace-nowrap px-4 py-3 text-slate-600">
-                {{ formatDateTime(user.CreatedAt) }}
+                {{ user.game_id }}
               </td>
             </tr>
             
