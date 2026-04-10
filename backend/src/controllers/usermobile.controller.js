@@ -27,6 +27,8 @@ export async function getUsermobileSuscribedGame(req, res) {
 
 export const getUsermobileSubscibedGame = getUsermobileSuscribedGame;
 
+
+
 export async function getGameByPhone(req, res) {
   const phoneParam = req.params.phone;
 
