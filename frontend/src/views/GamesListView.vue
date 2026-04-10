@@ -60,8 +60,8 @@ onMounted(() => {
         <table class="min-w-full divide-y divide-slate-200 text-sm">
           <thead class="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
             <tr>
-              <th class="px-4 py-3">Name</th>
               <th class="px-4 py-3">Game ID</th>
+              <th class="px-4 py-3">Name</th>
               <th class="px-4 py-3">Description</th>
               <th class="px-4 py-3">Created</th>
             </tr>
@@ -80,13 +80,12 @@ onMounted(() => {
               role="link"
               tabindex="0"
               @click="openGameRow(game.id)"
-              @keydown.enter.prevent="openGameRow(game.id)"
-            >
-              <td class="px-4 py-3 font-semibold text-slate-900">
-                {{ game.name }}
-              </td>
+              @keydown.enter.prevent="openGameRow(game.id)">
               <td class="px-4 py-3 font-semibold text-slate-900">
                 {{ game.game_id || "—" }}
+              </td>
+              <td class="px-4 py-3 font-semibold text-slate-900">
+                {{ game.name }}
               </td>
               <td class="max-w-md px-4 py-3 text-slate-600">
                 <span class="line-clamp-2">{{ game.description || "—" }}</span>

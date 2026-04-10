@@ -79,12 +79,18 @@ async function handleSubmit() {
   try {
     const savedGame = await apiRequest(isEditMode() ? `/api/games/${props.game?.id}` : "/api/games", {
       method: isEditMode() ? "PUT" : "POST",
+      headers: {
+       "Content-Type": "application/json",
+        // static Bearer token frontend local dev!
+        "Authorization": `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwiaWF0IjoxNzc1ODEwNzU2LCJleHAiOjE3NzU4Mzk1NTYsInN1YiI6IjEifQ.oGCNUf1jrQJOqzMB-rwHaLSAQl4MJArK647pKz_r7kc` 
+      },
       body: JSON.stringify({
         name: name.value.trim(),
         description: description.value.trim() || null,
         image_url: imageUrl.value.trim() || null,
       }),
     });
+    
 
     if (isEditMode()) {
       emit("updated", savedGame);
