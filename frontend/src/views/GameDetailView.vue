@@ -14,12 +14,15 @@ const props = defineProps({
 
 const game = ref(null);
 const subscribers = ref([]);
+const usermobiles = ref([]);
 const currentPage = ref(1);
 const subscribersTotal = ref(0);
 const subscribersTotalPages = ref(1);
 const loadError = ref("");
+const usermobilesLoadError = ref("");
 const isLoading = ref(true);
 const isSubscribersLoading = ref(false);
+const isUsermobilesLoading = ref(false);
 
 const numericGameId = computed(() => Number(props.gameId));
 
@@ -74,11 +77,28 @@ async function loadSubscribers() {
   }
 }
 
+async function loadUsermobiles() {
+  usermobilesLoadError.value = "";
+  isUsermobilesLoading.value = true;
+  try {
+    // const usermobilesPayload = await apiRequest(`/api/usermobile/games/${numericGameId.value}`);
+    const usermobilesPayload = await apiRequest(`/api/usermobile/games/${game.value.game_id}`);
+    usermobiles.value = Array.isArray(usermobilesPayload) ? usermobilesPayload : [];
+  } catch (error) {
+    usermobiles.value = [];
+    usermobilesLoadError.value = error?.message || "Failed to load verified mobile users";
+  } finally {
+    isUsermobilesLoading.value = false;
+  }
+}
+
 async function loadInitial() {
   loadError.value = "";
+  usermobilesLoadError.value = "";
   isLoading.value = true;
   game.value = null;
   subscribers.value = [];
+  usermobiles.value = [];
   subscribersTotal.value = 0;
   subscribersTotalPages.value = 1;
 
@@ -90,11 +110,12 @@ async function loadInitial() {
 
   try {
     await loadGame();
-    await loadSubscribers();
+    await Promise.all([loadSubscribers(), loadUsermobiles()]);
   } catch (error) {
     loadError.value = error?.message || "Failed to load game";
     game.value = null;
     subscribers.value = [];
+    usermobiles.value = [];
   } finally {
     isLoading.value = false;
   }
@@ -145,6 +166,7 @@ watch(
     </div>
 
     <template v-else-if="game">
+
       <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
         <div class="grid gap-6 p-6 md:grid-cols-[minmax(0,220px)_1fr] md:items-start">
           <div class="overflow-hidden rounded-xl border border-slate-100 bg-slate-50">
@@ -226,6 +248,7 @@ watch(
           <p class="text-xs text-slate-500">
             Page {{ currentPage }} of {{ subscribersTotalPages }}
           </p>
+
           <div class="flex justify-end gap-2">
             <button
               type="button"
@@ -246,6 +269,68 @@ watch(
               Next
             </button>
           </div>
+
+        </div>
+      </section>
+
+      <section>
+        <div class="mb-4 flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
+          <h2 class="text-lg font-semibold text-slate-900">Verified Mobile Users</h2>
+          <p class="text-sm text-slate-500">
+            {{ usermobiles.length }} Records
+          </p>
+        </div>
+
+        <p
+          v-if="usermobilesLoadError"
+          class="mb-4 rounded-lg border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800"
+        >
+          {{ usermobilesLoadError }}
+        </p>
+
+        <div
+          class="relative overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm"
+          :class="{ 'opacity-70': isUsermobilesLoading }"
+        >
+          <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-slate-200 text-sm">
+              <thead class="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
+                <tr>
+                  <th class="px-4 py-3">Phone Number</th>
+                  <th class="px-4 py-3">Game ID</th>
+                  <th class="px-4 py-3">Verified</th>
+                  <th class="px-4 py-3">Added</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-100">
+                <tr v-if="!isUsermobilesLoading && usermobiles.length === 0">
+                  <td colspan="4" class="px-4 py-8 text-center text-slate-500">
+                    No verified mobile users for this game yet.
+                  </td>
+                </tr>
+                <tr v-for="usermobile in usermobiles" :key="usermobile.id" class="hover:bg-slate-50/80">
+                  <td class="whitespace-nowrap px-4 py-3 font-medium text-slate-900">
+                    {{ usermobile.phone }}
+                  </td>
+                  <td class="whitespace-nowrap px-4 py-3 text-slate-600">
+                    {{ usermobile.game_id }}
+                  </td>
+                  <td class="whitespace-nowrap px-4 py-3 text-slate-600">
+                    {{ usermobile.is_verified ? "Yes" : "No" }}
+                  </td>
+                  <td class="whitespace-nowrap px-4 py-3 text-slate-600">
+                    {{ formatDateTime(usermobile.created_at) }}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p
+            v-if="isUsermobilesLoading"
+            class="absolute inset-0 flex items-center justify-center bg-white/60 text-sm font-medium text-slate-600"
+          >
+            Loading verified mobile users…
+          </p>
         </div>
       </section>
     </template>

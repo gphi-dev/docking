@@ -50,6 +50,8 @@ INSERT INTO `admins` (`id`, `username`, `password_hash`, `created_at`) VALUES
 
 CREATE TABLE `games` (
   `id` int UNSIGNED NOT NULL,
+  `game_id` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `secretkey` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `description` text COLLATE utf8mb4_unicode_ci,
   `image_url` varchar(2048) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -60,11 +62,11 @@ CREATE TABLE `games` (
 -- Dumping data for table `games`
 --
 
-INSERT INTO `games` (`id`, `name`, `description`, `image_url`, `created_at`) VALUES
-(1, 'Shabong Frenzy', 'Manok manokan', 'https://t4.ftcdn.net/jpg/07/68/11/93/240_F_768119371_8UAHPq8o2laeHuh7qUZRFu4qHUOmauDF.jpg', '2026-04-06 08:49:37'),
-(2, 'SabongSagad', 'local sabong for PH', 'https://as1.ftcdn.net/v2/jpg/08/29/56/44/1000_F_829564400_nVcTl2R5OHjzfhAedfvLE6i5W9kCxBsm.jpg', '2026-04-06 08:55:39'),
-(3, 'Chicken Ninja', 'RPG sabong', 'https://t4.ftcdn.net/jpg/06/72/53/29/240_F_672532957_nQlJFGOMGjbDAFawHU6ySuSYCAafw2AP.jpg', '2026-04-06 09:09:42'),
-(4, 'ShaboXing', 'Boxing ng manok', 'https://t3.ftcdn.net/jpg/15/97/31/36/240_F_1597313652_Qbf3PZaymphVRv56Pg3UXlZkAwY12ljj.jpg', '2026-04-06 09:19:30');
+INSERT INTO `games` (`id`, `game_id`,`secretkey`,`name`, `description`, `image_url`, `created_at`) VALUES
+(1, 'Shabong Frenzy', 'Manok manokan daw dawdaw', 'https://t4.ftcdn.net/jpg/07/68/11/93/240_F_768119371_8UAHPq8o2laeHuh7qUZRFu4qHUOmauDF.jpg', '2026-04-06 08:49:37'),
+(2, 'SabongSagad', 'local sabong for PH republic of china', 'https://as1.ftcdn.net/v2/jpg/08/29/56/44/1000_F_829564400_nVcTl2R5OHjzfhAedfvLE6i5W9kCxBsm.jpg', '2026-04-06 08:55:39'),
+(3, 'Chicken Ninja', 'RPG sabong bom panis', 'https://t4.ftcdn.net/jpg/06/72/53/29/240_F_672532957_nQlJFGOMGjbDAFawHU6ySuSYCAafw2AP.jpg', '2026-04-06 09:09:42'),
+(4, 'ShaboXing', 'Boxing ng manok laban ng pinas', 'https://t3.ftcdn.net/jpg/15/97/31/36/240_F_1597313652_Qbf3PZaymphVRv56Pg3UXlZkAwY12ljj.jpg', '2026-04-06 09:19:30');
 
 -- --------------------------------------------------------
 

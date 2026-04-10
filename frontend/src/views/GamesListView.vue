@@ -61,16 +61,17 @@ onMounted(() => {
           <thead class="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
             <tr>
               <th class="px-4 py-3">Name</th>
+              <th class="px-4 py-3">Game ID</th>
               <th class="px-4 py-3">Description</th>
               <th class="px-4 py-3">Created</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-slate-100">
             <tr v-if="isLoading">
-              <td colspan="3" class="px-4 py-10 text-center text-slate-500">Loading games…</td>
+              <td colspan="4" class="px-4 py-10 text-center text-slate-500">Loading games…</td>
             </tr>
             <tr v-else-if="games.length === 0">
-              <td colspan="3" class="px-4 py-10 text-center text-slate-500">No games found.</td>
+              <td colspan="4" class="px-4 py-10 text-center text-slate-500">No games found.</td>
             </tr>
             <tr
               v-for="game in games"
@@ -83,6 +84,9 @@ onMounted(() => {
             >
               <td class="px-4 py-3 font-semibold text-slate-900">
                 {{ game.name }}
+              </td>
+              <td class="px-4 py-3 font-semibold text-slate-900">
+                {{ game.game_id || "—" }}
               </td>
               <td class="max-w-md px-4 py-3 text-slate-600">
                 <span class="line-clamp-2">{{ game.description || "—" }}</span>

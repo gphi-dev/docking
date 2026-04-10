@@ -9,6 +9,24 @@ export async function listUsermobile(_req, res) {
   return res.json(usermobiles);
 }
 
+export async function getUsermobileSuscribedGame(req, res) {
+  const gameIdParam = req.params.gameId;
+
+  if (!gameIdParam) {
+    return res.status(400).json({ message: "Invalid game id" });
+  }
+
+  const usermobiles = await Usermobile.findAll({
+    where: { game_id: String(gameIdParam) },
+    order: [["created_at", "DESC"]],
+    attributes: { exclude: ["otp", "otp_expires_at"] },
+  });
+
+  return res.json(usermobiles);
+}
+
+export const getUsermobileSubscibedGame = getUsermobileSuscribedGame;
+
 export async function getGameByPhone(req, res) {
   const phoneParam = req.params.phone;
 

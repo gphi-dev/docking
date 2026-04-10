@@ -1,6 +1,7 @@
 import { Router } from "express";
 import {
   listUsermobile,
+  getUsermobileSuscribedGame,
   getGameByPhone,
   createUsermobile 
 } from "../controllers/usermobile.controller.js";
@@ -11,9 +12,11 @@ export const usermobileRouter = Router();
 // GET /usermobile
 usermobileRouter.get("/", asyncHandler(listUsermobile));
 
+// GET /usermobile/games/:gameId
+usermobileRouter.get("/games/:gameId", asyncHandler(getUsermobileSuscribedGame));
+
 // GET /usermobile/:phone
 usermobileRouter.get("/:phone", asyncHandler(getGameByPhone));
 
 // POST /usermobile <-- This handles creating the user!
 usermobileRouter.post("/usermobile", asyncHandler(createUsermobile));
-
