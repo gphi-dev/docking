@@ -21,6 +21,8 @@ const props = defineProps({
 const emit = defineEmits(["close", "created", "updated"]);
 
 const name = ref("");
+const gameid = ref("");
+const gamesecretkey = ref("");
 const description = ref("");
 const imageUrl = ref("");
 const errorMessage = ref("");
@@ -32,6 +34,8 @@ function isEditMode() {
 
 function resetForm() {
   name.value = "";
+  gameid.value = "";
+  gamesecretkey.value = "";
   description.value = "";
   imageUrl.value = "";
   errorMessage.value = "";
@@ -40,6 +44,8 @@ function resetForm() {
 
 function populateForm() {
   name.value = props.game?.name ?? "";
+  gameid.value = props.game?.game_id ?? "";
+  gamesecretkey.value = props.game?.game_secret_key ?? "";
   description.value = props.game?.description ?? "";
   imageUrl.value = props.game?.image_url ?? "";
   errorMessage.value = "";
@@ -86,6 +92,8 @@ async function handleSubmit() {
       },
       body: JSON.stringify({
         name: name.value.trim(),
+        game_id: Number(gameid.value),
+        game_secret_key: gamesecretkey.value.trim(),
         description: description.value.trim() || null,
         image_url: imageUrl.value.trim() || null,
       }),
@@ -150,6 +158,28 @@ async function handleSubmit() {
               required
               class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none ring-sky-500/30 focus:border-sky-500 focus:ring-2"
               placeholder="e.g. Lunar Quest"
+            />
+          </div>
+          <div>
+            <label class="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">
+              Game ID 
+            </label>
+            <input
+              v-model="gameid"
+              required
+              class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none ring-sky-500/30 focus:border-sky-500 focus:ring-2"
+              placeholder="Must be integer, e.g. 12345"
+            />
+          </div>
+          <div>
+            <label class="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">
+              Game Secret Key
+            </label>
+            <input
+              v-model="gamesecretkey"
+              required
+              class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none ring-sky-500/30 focus:border-sky-500 focus:ring-2"
+              placeholder="e.g. abc123"
             />
           </div>
           <div>

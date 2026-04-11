@@ -55,6 +55,8 @@ export async function getGameById(req, res) {
 
 export async function createGame(req, res) {
   const name = req.body?.name;
+  const game_id = Number(req.body?.game_id);
+  const game_secret_key = req.body?.game_secret_key;
   const description = req.body?.description ?? null;
   const imageUrl = req.body?.image_url ?? null;
 
@@ -64,6 +66,8 @@ export async function createGame(req, res) {
 
   const createdGame = await Game.create({
     name,
+    game_id,
+    game_secret_key,
     description,
     image_url: imageUrl,
   });
@@ -83,6 +87,8 @@ export async function updateGame(req, res) {
   }
 
   const nextName = req.body?.name;
+  const nextGameId = Number(req.body?.game_id);
+  const nextGameSecretKey = req.body?.game_secret_key;
   const nextDescription = req.body?.description;
   const nextImageUrl = req.body?.image_url;
 
@@ -91,6 +97,15 @@ export async function updateGame(req, res) {
       return res.status(400).json({ message: "name must be a non-empty string when provided" });
     }
     game.name = nextName;
+  }
+  if (nextGameId !== undefined) {
+    if (!Number.isFinite(nextGameId)) {
+      return res.status(400).json({ message: "game_id must be a valid integer" });
+    }
+    game.game_id = nextGameId;
+  }
+  if (nextGameSecretKey !== undefined) {
+    game.game_secret_key = nextGameSecretKey;
   }
   if (nextDescription !== undefined) {
     game.description = nextDescription;
