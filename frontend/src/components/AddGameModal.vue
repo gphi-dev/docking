@@ -7,9 +7,18 @@ const props = defineProps({
     type: Boolean,
     required: true,
   },
+  mode: {
+    type: String,
+    default: "create",
+    validator: (value) => ["create", "edit"].includes(value),
+  },
+  game: {
+    type: Object,
+    default: null,
+  },
 });
 
-const emit = defineEmits(["close", "created"]);
+const emit = defineEmits(["close", "created", "updated"]);
 
 const name = ref("");
 const description = ref("");
@@ -17,17 +26,41 @@ const imageUrl = ref("");
 const errorMessage = ref("");
 const isSubmitting = ref(false);
 
+function isEditMode() {
+  return props.mode === "edit";
+}
+
+function resetForm() {
+  name.value = "";
+  description.value = "";
+  imageUrl.value = "";
+  errorMessage.value = "";
+  isSubmitting.value = false;
+}
+
+function populateForm() {
+  name.value = props.game?.name ?? "";
+  description.value = props.game?.description ?? "";
+  imageUrl.value = props.game?.image_url ?? "";
+  errorMessage.value = "";
+  isSubmitting.value = false;
+}
+
 watch(
-  () => props.open,
-  (isOpen) => {
-    if (isOpen) {
-      name.value = "";
-      description.value = "";
-      imageUrl.value = "";
-      errorMessage.value = "";
-      isSubmitting.value = false;
+  () => [props.open, props.mode, props.game],
+  ([isOpen]) => {
+    if (!isOpen) {
+      return;
     }
+
+    if (isEditMode()) {
+      populateForm();
+      return;
+    }
+
+    resetForm();
   },
+  { immediate: true },
 );
 
 function handleBackdropClick() {
@@ -44,18 +77,30 @@ async function handleSubmit() {
   }
   isSubmitting.value = true;
   try {
-    const createdGame = await apiRequest("/api/games", {
-      method: "POST",
+    const savedGame = await apiRequest(isEditMode() ? `/api/games/${props.game?.id}` : "/api/games", {
+      method: isEditMode() ? "PUT" : "POST",
+      headers: {
+       "Content-Type": "application/json",
+        // static Bearer token frontend local dev!
+        "Authorization": `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwiaWF0IjoxNzc1ODEwNzU2LCJleHAiOjE3NzU4Mzk1NTYsInN1YiI6IjEifQ.oGCNUf1jrQJOqzMB-rwHaLSAQl4MJArK647pKz_r7kc` 
+      },
       body: JSON.stringify({
         name: name.value.trim(),
         description: description.value.trim() || null,
         image_url: imageUrl.value.trim() || null,
       }),
     });
-    emit("created", createdGame);
+    
+
+    if (isEditMode()) {
+      emit("updated", savedGame);
+    } else {
+      emit("created", savedGame);
+    }
+
     emit("close");
   } catch (error) {
-    errorMessage.value = error?.message || "Could not create game";
+    errorMessage.value = error?.message || `Could not ${isEditMode() ? "update" : "create"} game`;
   } finally {
     isSubmitting.value = false;
   }
@@ -77,8 +122,12 @@ async function handleSubmit() {
       >
         <div class="mb-4 flex items-start justify-between gap-4">
           <div>
-            <h2 class="text-lg font-semibold text-slate-900">Add game</h2>
-            <p class="mt-1 text-sm text-slate-500">Create a new game entry for your catalog.</p>
+            <h2 class="text-lg font-semibold text-slate-900">
+              {{ isEditMode() ? "Update game" : "Add game" }}
+            </h2>
+            <p class="mt-1 text-sm text-slate-500">
+              {{ isEditMode() ? "Update the selected game entry." : "Create a new game entry for your catalog." }}
+            </p>
           </div>
           <button
             type="button"
@@ -144,7 +193,7 @@ async function handleSubmit() {
               class="rounded-lg bg-sky-600 px-4 py-2 text-sm font-semibold text-white hover:bg-sky-500 disabled:opacity-60"
               :disabled="isSubmitting"
             >
-              {{ isSubmitting ? "Saving…" : "Create game" }}
+              {{ isSubmitting ? "Saving…" : isEditMode() ? "Update game" : "Create game" }}
             </button>
           </div>
         </form>

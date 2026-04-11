@@ -1,14 +1,18 @@
 <script setup>
 import { onMounted, ref } from "vue";
-import { RouterLink } from "vue-router";
+import { RouterLink, useRouter } from "vue-router";
 import { apiRequest } from "../api/http";
 import AddGameModal from "../components/AddGameModal.vue";
 
+const router = useRouter();
 const games = ref([]);
 const recentSubscribers = ref([]);
 const loadError = ref("");
 const isLoading = ref(true);
 const isAddGameModalOpen = ref(false);
+const isEditGameModalOpen = ref(false);
+const selectedGame = ref(null);
+const deletingGameId = ref(null);
 
 function formatDateTime(isoString) {
   if (!isoString) {
@@ -43,6 +47,38 @@ async function loadDashboardData() {
 
 function handleGameCreated() {
   loadDashboardData();
+}
+
+function handleGameUpdated() {
+  loadDashboardData();
+}
+
+function openGameDetail(gameId) {
+  router.push({ name: "game-detail", params: { gameId: String(gameId) } });
+}
+
+function openEditGameModal(game) {
+  selectedGame.value = { ...game };
+  isEditGameModalOpen.value = true;
+}
+
+async function handleDeleteGame(game) {
+  const shouldDelete = window.confirm(`Delete "${game.name}"?`);
+  if (!shouldDelete) {
+    return;
+  }
+
+  deletingGameId.value = game.id;
+  loadError.value = "";
+
+  try {
+    await apiRequest(`/api/games/${game.id}`, { method: "DELETE" });
+    games.value = games.value.filter((item) => item.id !== game.id);
+  } catch (error) {
+    loadError.value = error?.message || "Could not delete game";
+  } finally {
+    deletingGameId.value = null;
+  }
 }
 
 onMounted(() => {
@@ -96,39 +132,62 @@ onMounted(() => {
         No games yet. Use <span class="font-semibold text-slate-700">Add game</span> to create one.
       </div>
       <div v-else class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-        <RouterLink
+        <article
           v-for="game in games"
           :key="game.id"
-          :to="{ name: 'game-detail', params: { gameId: String(game.id) } }"
           class="group flex overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:border-sky-200 hover:shadow-md"
         >
-          <div class="relative h-28 w-28 shrink-0 bg-slate-100">
-            <img
-              v-if="game.image_url"
-              :src="game.image_url"
-              :alt="game.name"
-              class="h-full w-full object-cover"
-              loading="lazy"
-            />
-            <div
-              v-else
-              class="flex h-full w-full items-center justify-center text-xs font-semibold text-slate-400"
-            >
-              No image
+          <button
+            type="button"
+            class="flex min-w-0 flex-1 text-left"
+            @click="openGameDetail(game.game_id)"
+          >
+            <div class="relative h-28 w-28 shrink-0 bg-slate-100">
+              <img
+                v-if="game.image_url"
+                :src="game.image_url"
+                :alt="game.name"
+                class="h-full w-full object-cover"
+                loading="lazy"
+              />
+              <div
+                v-else
+                class="flex h-full w-full items-center justify-center text-xs font-semibold text-slate-400"
+              >
+                No image
+              </div>
             </div>
+            <div class="flex min-w-0 flex-1 flex-col p-4">
+              <p class="truncate text-sm font-semibold text-slate-900 group-hover:text-sky-800">
+                {{ game.name }}
+              </p>
+              <p class="mt-1 text-[11px] font-semibold uppercase tracking-wide text-sky-700">
+                Game ID: {{ game.game_id }}
+              </p>
+              <p class="mt-1 line-clamp-2 text-xs text-slate-600">
+                {{ game.description || "No description" }}
+              </p>
+              <p class="mt-auto pt-3 text-[11px] font-medium uppercase tracking-wide text-slate-400">
+                Added {{ formatDateTime(game.created_at) }}
+              </p>
+            </div>
+          </button>
+          <div class="flex shrink-0 flex-col justify-center gap-2 border-l border-slate-100 px-3 py-4">
+            <button
+              type="button"
+              class="rounded-lg border border-slate-200 px-3 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-50"
+              @click="openEditGameModal(game)">
+              Edit
+            </button>
+            <button
+              type="button"
+              class="rounded-lg border border-rose-200 px-3 py-2 text-xs font-semibold text-rose-700 transition hover:bg-rose-50 disabled:cursor-not-allowed disabled:opacity-60"
+              :disabled="deletingGameId === game.id"
+              @click="handleDeleteGame(game)">
+              {{ deletingGameId === game.id ? "Deleting…" : "Delete" }}
+            </button>
           </div>
-          <div class="flex min-w-0 flex-1 flex-col p-4">
-            <p class="truncate text-sm font-semibold text-slate-900 group-hover:text-sky-800">
-              {{ game.name }}
-            </p>
-            <p class="mt-1 line-clamp-2 text-xs text-slate-600">
-              {{ game.description || "No description" }}
-            </p>
-            <p class="mt-auto pt-3 text-[11px] font-medium uppercase tracking-wide text-slate-400">
-              Added {{ formatDateTime(game.created_at) }}
-            </p>
-          </div>
-        </RouterLink>
+        </article>
       </div>
     </section>
 
@@ -181,8 +240,16 @@ onMounted(() => {
 
     <AddGameModal
       :open="isAddGameModalOpen"
+      mode="create"
       @close="isAddGameModalOpen = false"
       @created="handleGameCreated"
+    />
+    <AddGameModal
+      :open="isEditGameModalOpen"
+      :game="selectedGame"
+      mode="edit"
+      @close="isEditGameModalOpen = false"
+      @updated="handleGameUpdated"
     />
   </div>
 </template>

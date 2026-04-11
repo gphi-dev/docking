@@ -5,6 +5,8 @@ import { apiRequest } from "../api/http";
 const admins = ref([]);
 const loadError = ref("");
 const isLoading = ref(true);
+const isAddUserModalOpen = ref(false);
+// const isEditUserModalOpen = ref(false);
 
 function formatDateTime(isoString) {
   if (!isoString) {
@@ -33,21 +35,41 @@ async function loadAdmins() {
   }
 }
 
+function handleUserCreated() {
+  loadAdmins();
+}
+
+// function handleUserUpdated() {
+//   loadAdmins();
+// }
+
 onMounted(() => {
   loadAdmins();
 });
+
 </script>
 
 <template>
+
+
   <div class="space-y-6">
     <div>
       <h1 class="text-2xl font-semibold tracking-tight text-slate-900">Admin users</h1>
       <p class="mt-1 text-sm text-slate-600">Accounts that can sign in to this console.</p>
     </div>
+    <div class="flex shrink-0 justify-end">
+      <button
+        type="button"
+        class="inline-flex items-center justify-center rounded-lg bg-sky-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-sky-500"
+        @click="isAddUserModalOpen = true"
+      >
+        Add Admin
+      </button>
+    </div>
 
     <p v-if="loadError" class="rounded-lg border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800">
       {{ loadError }}
-    </p>
+    </p> 
 
     <div class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
       <div class="overflow-x-auto">
@@ -77,5 +99,14 @@ onMounted(() => {
         </table>
       </div>
     </div>
+
+    <AddUserModal
+    :open="isAddUserModalOpen"
+    mode="create"
+    @close="isAddUserModalOpen = false"
+    @created="handleUserCreated"
+    />
+    
+
   </div>
 </template>

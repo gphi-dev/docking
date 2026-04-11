@@ -2,9 +2,11 @@ import express from "express";
 import cors from "cors";
 import { env } from "./config/env.js";
 import { authRouter } from "./routes/auth.routes.js";
+// import authRouter from "./routes/auth.routes.js";
 import { gamesRouter } from "./routes/games.routes.js";
 import { subscribersRouter } from "./routes/subscribers.routes.js";
 import { adminsRouter } from "./routes/admins.routes.js";
+import { usermobileRouter } from "./routes/usermobile.routes.js"; // Adjust path if needed
 import { authenticateAdminJwt } from "./middleware/authenticateAdminJwt.js";
 
 export function createApp() {
@@ -32,6 +34,8 @@ export function createApp() {
   app.use("/api/games", authenticateAdminJwt, gamesRouter);
   app.use("/api/subscribers", authenticateAdminJwt, subscribersRouter);
   app.use("/api/admins", authenticateAdminJwt, adminsRouter);
+
+  app.use("/api/usermobile", usermobileRouter);
 
   app.use((req, res) => {
     res.status(404).json({ message: `Route not found: ${req.method} ${req.path}` });

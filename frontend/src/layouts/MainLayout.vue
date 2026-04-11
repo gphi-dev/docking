@@ -9,6 +9,7 @@ const navigationLinks = [
   { to: { name: "dashboard" }, label: "Dashboard" },
   { to: { name: "games" }, label: "Games" },
   { to: { name: "admins" }, label: "Admin users" },
+  { to: { name: "user-api" }, label: "Usermobile List" },
 ];
 
 function handleLogout() {

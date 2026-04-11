@@ -6,6 +6,7 @@ import DashboardView from "../views/DashboardView.vue";
 import GamesListView from "../views/GamesListView.vue";
 import GameDetailView from "../views/GameDetailView.vue";
 import AdminUsersView from "../views/AdminUsersView.vue";
+import UserAPIView from "../views/UserAPIView.vue";
 
 export const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -41,6 +42,11 @@ export const router = createRouter({
           path: "admins",
           name: "admins",
           component: AdminUsersView,
+        },
+        {
+          path: "user-api",
+          name: "user-api",
+          component: UserAPIView,
         },
       ],
     },
